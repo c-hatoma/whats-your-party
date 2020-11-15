@@ -42,6 +42,39 @@ probIndGivenBlack <- 0.06
 probRepGivenHispanic <- 0.27
 probDemGivenHispanic <- 0.63
 probIndGivenHispanic <- 0.10
+
+#Probabilities given generation
+
+probRepGivenMillennial <- .36
+probDemGivenMillennial <- .57
+probIndGivenMillennial <- .41
+
+probRepGivenGenX <- .42
+probDemGivenGenX <- .48
+probDemGivenGenX <- .36
+
+probRepGivenBabyBoomer <- .49
+probDemGivenBabyBoomer <- .45
+probDemGivenBabyBoomer <- .30
+
+probRepGivenSilent <- .53
+probDemGivenSilent <- .40
+probIndGivenSilent <- .23
+
+#Probabilities given income
+
+probRepGiven75plus <- 49
+probDemGiven75plus <- 45
+probIndGiven75plus <- 34
+
+probRepGiven30to75 <- 48
+probDemGiven30to75 <- 45
+probIndGiven30to75 <- 34
+
+probRepGivenlessthan30 <- 32
+probDemGivenlessthan30 <- 60
+probIndGivenlessthan30 <- 34
+
 ```
 
 Now, let's see the class priors.
@@ -70,6 +103,22 @@ probFemale <- 0.508
 probWhite <- 0.62
 probBlack <- 0.123
 probHispanic <- 0.125
+
+#Generation priors
+
+probMillennial <- 0.201
+probGenX <- 0.235
+probBabyBoomer <- 0.417
+probSilent <- 0.148
+
+#Income priors
+
+prob75plus <- 0.452
+prob30to75 <- 0.350
+problessthan30 <- 0.198
+
+
+
 ```
 
 Now that we have all of these, we can used the naive bayes theorem to calculate 
@@ -77,32 +126,71 @@ each of the likelihoods which will be critical in making our predictions.
 \vspace{12 pt}
 
 ```{r likelihoods}
-#Likelihoods given Rep
+##Likelihoods given Rep
 
+#by sex
 probMaleGivenRep <- probRepGivenMale*probMale/probRep
 probFemaleGivenRep <- probRepGivenFemale*probFemale/probRep
 
+#by race
 probWhiteGivenRep <- probRepGivenWhite*probWhite/probRep
 probBlackGivenRep <- probRepGivenBlack*probBlack/probRep
 probHispanicGivenRep <- probRepGivenHispanic*probHispanic/probRep
 
-#Likelihoods given Dem
+#by generation
+probMillennialGivenRep <- probRepGivenMillennial/probRep
+probGenXGivenRep <- probRepGivenGenX/probRep
+probBabyBoomerGivenRep <- probRepGivenBabyBoomer/probRep
+probSilentGivenRep <- probRepGivenSilent/probRep
 
+#by income
+prob75plusGivenRep <- probRepGiven75plus/probRep
+prob30to75GivenRep <- probRepGiven30to75/probRep
+problessthan30GivenRep <- probRepGivenlessthan30/probRep
+
+##Likelihoods given Dem
+
+#by sex
 probMaleGivenDem <- probDemGivenMale*probMale/probDem
 probFemaleGivenDem <- probDemGivenFemale*probFemale/probDem
 
+#by race
 probWhiteGivenDem <- probDemGivenWhite*probWhite/probDem
 probBlackGivenDem <- probDemGivenBlack*probBlack/probDem
 probHispanicGivenDem <- probDemGivenHispanic*probHispanic/probDem
 
-#Likelihoods given Ind
+#by generation
+probMillennialGivenDem <- probDemGivenMillennial/probDem
+probGenXGivenDem <- probDemGivenGenX/probDem
+probBabyBoomerGivenDem <- probDemGivenBabyBoomer/probDem
+probSilentGivenDem <- probDemGivenSilent/probDem
 
+#by income
+prob75plusGivenDem <- probDemGiven75plus/probDem
+prob30to75GivenDem <- probDemGiven30to75/probDem
+problessthan30GivenDem <- probDemGivenlessthan30/probDem
+
+##Likelihoods given Ind
+
+#by sex
 probMaleGivenInd <- probIndGivenMale*probMale/probInd
 probFemaleGivenInd <- probIndGivenFemale*probFemale/probInd
 
+#by race
 probWhiteGivenInd <- probIndGivenWhite*probWhite/probInd
 probBlackGivenInd <- probIndGivenBlack*probBlack/probInd
 probHispanicGivenInd <- probIndGivenHispanic*probHispanic/probInd
+
+#by generation
+probMillennialGivenDem <- probDemGivenMillennial/probDem
+probGenXGivenDem <- probDemGivenGenX/probDem
+probBabyBoomerGivenDem <- probDemGivenBabyBoomer/probDem
+probSilentGivenDem <- probDemGivenSilent/probDem
+
+#by income
+prob75plusGivenDem <- probDemGiven75plus/probDem
+prob30to75GivenDem <- probDemGiven30to75/probDem
+problessthan30GivenDem <- probDemGivenlessthan30/probDem
 ```
 
 So, if we come up with an example person, we can see which class (political 
