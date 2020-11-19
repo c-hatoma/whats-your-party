@@ -108,6 +108,17 @@ probIndGivenSomeCollege <- 0.09
 probRepGivenHighSchool <- 0.45
 probDemGivenHighSchool <- 0.46
 probIndGivenHighSchool <- 0.08
+
+#Probabilities given marital status
+
+probRepGivenMarried <- 0.51
+probDemGivenMarried <- 0.44
+probIndGivenMarried <- 0.06
+
+probRepGivenUnmarried <- 0.36
+probDemGivenUnmarried <- 0.56
+probIndGivenUnmarried <- 0.08
+
 ```
 
 Now, let's see the class priors.
@@ -164,6 +175,11 @@ probCollegeGrad <- 0.329
 probSomeCollege <- 0.278
 probHighSchool <- 0.229
 
+#Marital Status priors
+
+probMarried <- 0.574
+probUnmarried <- 0.426
+
 ```
 
 Now that we have all of these, we can used the naive bayes theorem to calculate 
@@ -205,6 +221,10 @@ probCollegeGradGivenRep <- probRepGivenCollegeGrad*probCollegeGrad/probRep
 probSomeCollegeGivenRep <- probRepGivenSomeCollege*probSomeCollege/probRep
 probHighSchoolGivenRep <- probRepGivenHighSchool*probHighSchool/probRep
 
+#by marital status
+probMarriedGivenRep <- probRepGivenMarried*probMarried/probRep
+probUnmarriedGivenRep <- probRepGivenUnmarried*probUnmarried/probRep
+
 ##Likelihoods given Dem
 
 #by sex
@@ -239,6 +259,10 @@ probCollegeGradGivenDem <- probDemGivenCollegeGrad*probCollegeGrad/probDem
 probSomeCollegeGivenDem <- probDemGivenSomeCollege*probSomeCollege/probDem
 probHighSchoolGivenDem <- probDemGivenHighSchool*probHighSchool/probDem
 
+#by marital status
+probMarriedGivenDem <- probDemGivenMarried*probMarried/probDem
+probUnmarriedGivenDem <- probDemGivenUnmarried*probUnmarried/probDem
+
 ##Likelihoods given Ind
 
 #by sex
@@ -272,6 +296,10 @@ probPostgradGivenInd <- probIndGivenPostgrad*probPostgrad/probInd
 probCollegeGradGivenInd <- probIndGivenCollegeGrad*probCollegeGrad/probInd
 probSomeCollegeGivenInd <- probIndGivenSomeCollege*probSomeCollege/probInd
 probHighSchoolGivenInd <- probIndGivenHighSchool*probHighSchool/probInd
+
+#by marital status
+probMarriedGivenInd <- probIndGivenMarried*probMarried/probInd
+probUnmarriedGivenInd <- probIndGivenUnmarried*probUnmarried/probInd
 
 ```
 
