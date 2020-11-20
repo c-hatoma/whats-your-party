@@ -460,7 +460,7 @@ server <- function(input, output, session) {
   
     output$prediction <- renderText({
         
-        test
+        test1
         
     })
     
