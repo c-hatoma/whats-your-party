@@ -1,0 +1,349 @@
+---
+title: "Political Lean Classification with Naive Bayes"
+author: "Chica Morrow and Bryce Samwel"
+date: "11/19/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Many people and tables discuss the relationship between political leaning and a given demographic. However, what we are attempting to do is predict someone's political leaning based on many demographic features. Presently, we are considering a person's sex, race, generation, community type, income, education, and marital status. To accomplish this we are using a Naive Bayes Classifier and survey data from the Pew Research Center. Before we jump into the code, we should discuss the Naive Bayes Classifier for those that aren't familiar.
+\vspace{12 pt}
+
+## Naive Bayes
+
+The Naive Bayes Classifier is a probabilistic classifier based on the application of Bayes' theorem. One of the major assumptions made by this classifier is that the various features are independent. In almost all cases that won't be true, but it's worth noting before we continue. Considering that Bayes' theorem is central to this classifier, let's take a look at the mathematical formulation and make some sense of it.
+
+$$
+p(A|B) = \frac{p(A)p(B|A)}{p(B)}
+$$
+For example, if A is "lean republican" and B is "is married", Bayes' theorem says that the probability a person will lean republican given that they are married is equal to the probability that a person will lean republican, multiplied by the probability that a person will be married given that they lean republican, divided by the probability that a person will be married. Putting this equation into Bayesian probability terminology, it can be read as follows:
+
+$$
+\text{posterior}=\frac{\text{prior}*\text{likelihood}}{\text{evidence}}
+$$
+We refer to the prior in this instance as the class prior, where the classes are the political leanings, and the evidence as the predictor prior, where the predictors are the demographic features of a given individual.
+
+Okay, so we now know how to predict the probability of someone leaning a certain way given a single demographic. As it turns out, the simple classifier doesn't get much more complicated than this. Given many features, we can calculate a class "score" by multiplying the likelihoods for that class as well as the prior for that class. The class with the highest "score" is selected as the prediction. You can see an example of how this is applied with our code at the end of this paper.
+\vspace{12 pt}
+
+## A Brief Discussion of the Data
+
+Normally, we would use a dataset of individuals with information on the features and political leaning of each of them. However, we couldn't find such a dataset very easily. Instead, we found a table from the Pew Research Center. It's titled "2016 Party Identification Detailed Tables." Oddly enough, the table gives us the posteriors and class priors. Additionally, one should only build a model based on a single dataset. However, the predictor priors from the Pew Research Center table differ a little bit from census data. We instead use census data from 2016 for our predictor priors. Ultimately, we need to calculate the likelihoods manually using Bayes' theorem. 
+
+## Calculating the Likelihoods
+
+This section is very code-heavy and is primarily the hand-encoding of each of the priors and the posteriors. First, let's look at the posteriors.
+\vspace{12 pt}
+
+```{r posteriors}
+#Probabilities given sex
+
+probRepGivenMale <- 0.51
+probDemGivenMale <- 0.41
+probIndGivenMale <- 0.08
+
+probRepGivenFemale <- 0.38
+probDemGivenFemale <- 0.54
+probIndGivenFemale <- 0.08
+
+#Probabilities given race/ethnicity
+
+probRepGivenWhite <- 0.54
+probDemGivenWhite <- 0.39
+probIndGivenWhite <- 0.07
+
+probRepGivenBlack <- 0.07
+probDemGivenBlack <- 0.87
+probIndGivenBlack <- 0.06
+
+probRepGivenHispanic <- 0.27
+probDemGivenHispanic <- 0.63
+probIndGivenHispanic <- 0.10
+
+probRepGivenAsian <- 0.27
+probDemGivenAsian <- 0.66
+probIndGivenAsian <- 0.07
+
+#Probabilities given generation
+
+probRepGivenMillenial <- 0.36
+probDemGivenMillenial <- 0.57
+probIndGivenMillenial <- 0.07
+
+probRepGivenGenX <- 0.42
+probDemGivenGenX <- 0.48
+probIndGivenGenX <- 0.09
+
+probRepGivenBoomer <- 0.49
+probDemGivenBoomer <- 0.45
+probIndGivenBoomer <- 0.06
+
+probRepGivenSilent <- 0.53
+probDemGivenSilent <- 0.40
+probIndGivenSilent <- 0.07
+
+#Probabilities given community type
+
+probRepGivenUrban <- 0.33
+probDemGivenUrban <- 0.60
+probIndGivenUrban <- 0.07
+
+probRepGivenSuburban <- 0.48
+probDemGivenSuburban <- 0.44
+probIndGivenSuburban <- 0.07
+
+probRepGivenRural <- 0.55
+probDemGivenRural <- 0.37
+probIndGivenRural <- 0.08
+
+#Probabilities given income
+
+probRepGiven75plus <- 0.49
+probDemGiven75plus <- 0.45
+probIndGiven75plus <- 0.06
+
+probRepGiven30to75 <- 0.48
+probDemGiven30to75 <- 0.45
+probIndGiven30to75 <- 0.07
+
+probRepGivenlessthan30 <- 0.32
+probDemGivenlessthan30 <- 0.60
+probIndGivenlessthan30 <- 0.08
+
+#Probabilities given education
+
+probRepGivenPostgrad <- 0.35
+probDemGivenPostgrad <- 0.60
+probIndGivenPostgrad <- 0.05
+
+probRepGivenCollegeGrad <- 0.44
+probDemGivenCollegeGrad <- 0.50
+probIndGivenCollegeGrad <- 0.06
+
+probRepGivenSomeCollege <- 0.46
+probDemGivenSomeCollege <- 0.45
+probIndGivenSomeCollege <- 0.09
+
+probRepGivenHighSchool <- 0.45
+probDemGivenHighSchool <- 0.46
+probIndGivenHighSchool <- 0.08
+
+#Probabilities given marital status
+
+probRepGivenMarried <- 0.51
+probDemGivenMarried <- 0.44
+probIndGivenMarried <- 0.06
+
+probRepGivenUnmarried <- 0.36
+probDemGivenUnmarried <- 0.56
+probIndGivenUnmarried <- 0.08
+
+```
+
+Now, let's see the class priors.
+\vspace{12 pt}
+
+```{r class_priors}
+#Class priors
+
+probRep <- 0.44
+probDem <- 0.48
+probInd <- 0.08
+
+```
+
+And the predictor priors...
+\vspace{12 pt}
+
+```{r predictor_priors}
+#Sex priors
+
+probMale <- 0.492
+probFemale <- 0.508
+
+#Race/ethnicity priors
+
+probWhite <- 0.62
+probBlack <- 0.123
+probHispanic <- 0.173
+probAsian <- 0.052
+
+#Generation Priors
+
+probMillenial <- 0.197
+probGenX <- 0.23
+probBoomer <- 0.408
+probSilent <- 0.145
+
+#Community Type priors
+probUrban <- 0.336
+probSuburban <- 0.466
+probRural <- 0.171
+probHispanic <- 0.125
+
+#Income priors
+
+prob75plus <- 0.452
+prob30to75 <- 0.350
+problessthan30 <- 0.198
+
+#Education priors
+
+probPostgrad <- 0.159
+probCollegeGrad <- 0.329
+probSomeCollege <- 0.278
+probHighSchool <- 0.229
+
+#Marital Status priors
+
+probMarried <- 0.574
+probUnmarried <- 0.426
+
+```
+
+Now that we have all of these, we can use Bayes' theorem to calculate each of the likelihoods which will be critical in making our predictions.
+\vspace{12 pt}
+
+```{r likelihoods}
+##Likelihoods given Rep
+
+#by sex
+probMaleGivenRep <- probRepGivenMale*probMale/probRep
+probFemaleGivenRep <- probRepGivenFemale*probFemale/probRep
+
+#by race
+probWhiteGivenRep <- probRepGivenWhite*probWhite/probRep
+probBlackGivenRep <- probRepGivenBlack*probBlack/probRep
+probHispanicGivenRep <- probRepGivenHispanic*probHispanic/probRep
+probAsianGivenRep <- probRepGivenAsian*probAsian/probRep
+
+#by generation
+probMillenialGivenRep <- probRepGivenMillenial*probMillenial/probRep
+probGenXGivenRep <- probRepGivenGenX*probGenX/probRep
+probBoomerGivenRep <- probRepGivenBoomer*probBoomer/probRep
+probSilentGivenRep <- probRepGivenSilent*probSilent/probRep
+
+#by community type
+probUrbanGivenRep <- probRepGivenUrban*probUrban/probRep
+probSuburbanGivenRep <- probRepGivenSuburban*probSuburban/probRep
+probRuralGivenRep <- probRepGivenRural*probRural/probRep
+
+#by income
+prob75plusGivenRep <- probRepGiven75plus*prob75plus/probRep
+prob30to75GivenRep <- probRepGiven30to75*prob30to75/probRep
+problessthan30GivenRep <- probRepGivenlessthan30*problessthan30/probRep
+
+#by education
+probPostgradGivenRep <- probRepGivenPostgrad*probPostgrad/probRep
+probCollegeGradGivenRep <- probRepGivenCollegeGrad*probCollegeGrad/probRep
+probSomeCollegeGivenRep <- probRepGivenSomeCollege*probSomeCollege/probRep
+probHighSchoolGivenRep <- probRepGivenHighSchool*probHighSchool/probRep
+
+#by marital status
+probMarriedGivenRep <- probRepGivenMarried*probMarried/probRep
+probUnmarriedGivenRep <- probRepGivenUnmarried*probUnmarried/probRep
+
+##Likelihoods given Dem
+
+#by sex
+probMaleGivenDem <- probDemGivenMale*probMale/probDem
+probFemaleGivenDem <- probDemGivenFemale*probFemale/probDem
+
+#by race
+probWhiteGivenDem <- probDemGivenWhite*probWhite/probDem
+probBlackGivenDem <- probDemGivenBlack*probBlack/probDem
+probHispanicGivenDem <- probDemGivenHispanic*probHispanic/probDem
+probAsianGivenDem <- probDemGivenAsian*probAsian/probDem
+
+#by generation
+probMillenialGivenDem <- probDemGivenMillenial*probMillenial/probDem
+probGenXGivenDem <- probDemGivenGenX*probGenX/probDem
+probBoomerGivenDem <- probDemGivenBoomer*probBoomer/probDem
+probSilentGivenDem <- probDemGivenSilent*probSilent/probDem
+
+#by community type
+probUrbanGivenDem <- probDemGivenUrban*probUrban/probDem
+probSuburbanGivenDem <- probDemGivenSuburban*probSuburban/probDem
+probRuralGivenDem <- probDemGivenRural*probRural/probDem
+
+#by income
+prob75plusGivenDem <- probDemGiven75plus*prob75plus/probDem
+prob30to75GivenDem <- probDemGiven30to75*prob30to75/probDem
+problessthan30GivenDem <- probDemGivenlessthan30*problessthan30/probDem
+
+#by education
+probPostgradGivenDem <- probDemGivenPostgrad*probPostgrad/probDem
+probCollegeGradGivenDem <- probDemGivenCollegeGrad*probCollegeGrad/probDem
+probSomeCollegeGivenDem <- probDemGivenSomeCollege*probSomeCollege/probDem
+probHighSchoolGivenDem <- probDemGivenHighSchool*probHighSchool/probDem
+
+#by marital status
+probMarriedGivenDem <- probDemGivenMarried*probMarried/probDem
+probUnmarriedGivenDem <- probDemGivenUnmarried*probUnmarried/probDem
+
+##Likelihoods given Ind
+
+#by sex
+probMaleGivenInd <- probIndGivenMale*probMale/probInd
+probFemaleGivenInd <- probIndGivenFemale*probFemale/probInd
+
+#by race
+probWhiteGivenInd <- probIndGivenWhite*probWhite/probInd
+probBlackGivenInd <- probIndGivenBlack*probBlack/probInd
+probHispanicGivenInd <- probIndGivenHispanic*probHispanic/probInd
+probAsianGivenInd <- probIndGivenAsian*probAsian/probInd
+
+#by generation
+probMillenialGivenInd <- probIndGivenMillenial*probMillenial/probInd
+probGenXGivenInd <- probIndGivenGenX*probGenX/probInd
+probBoomerGivenInd <- probIndGivenBoomer*probBoomer/probInd
+probSilentGivenInd <- probIndGivenSilent*probSilent/probInd
+
+#by community type
+probUrbanGivenInd <- probIndGivenUrban*probUrban/probInd
+probSuburbanGivenInd <- probIndGivenSuburban*probSuburban/probInd
+probRuralGivenInd <- probIndGivenRural*probRural/probInd
+
+#by income
+prob75plusGivenDem <- probDemGiven75plus*prob75plus/probDem
+prob30to75GivenDem <- probDemGiven30to75*prob30to75/probDem
+problessthan30GivenDem <- probDemGivenlessthan30*problessthan30/probDem
+
+#by education
+probPostgradGivenInd <- probIndGivenPostgrad*probPostgrad/probInd
+probCollegeGradGivenInd <- probIndGivenCollegeGrad*probCollegeGrad/probInd
+probSomeCollegeGivenInd <- probIndGivenSomeCollege*probSomeCollege/probInd
+probHighSchoolGivenInd <- probIndGivenHighSchool*probHighSchool/probInd
+
+#by marital status
+probMarriedGivenInd <- probIndGivenMarried*probMarried/probInd
+probUnmarriedGivenInd <- probIndGivenUnmarried*probUnmarried/probInd
+
+```
+
+## An Example Prediction
+
+If we come up with an example person, we can see which class (political leaning) they are most likely to fall into! Let's suppose that we are interested in knowing a black woman's leaning. It's as simple as multiplying the prior for a given class by the likelihoods for that person given that class. The class with the highest outcome is our prediction! Let's do the calculations.
+\vspace{12 pt}
+
+```{r Black_Woman_Prediction}
+#Republican
+
+probRep*probBlackGivenRep*probFemaleGivenRep
+
+#Democrat
+
+probDem*probBlackGivenDem*probFemaleGivenDem
+
+#Independent
+
+probInd*probBlackGivenInd*probFemaleGivenInd
+```
+
+As we can see, the value for leaning democratic is higher than all of the other values, so we would predict that a black woman leans democratic based on this simple model!
+\vspace{12 pt}
