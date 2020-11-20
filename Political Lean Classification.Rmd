@@ -1,5 +1,5 @@
 ---
-title: "Political Lean Classification"
+title: "Political Lean Classification with Naive Bayes"
 author: "Chica Morrow and Bryce Samwel"
 date: "11/11/2020"
 output: pdf_document
@@ -11,9 +11,33 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-We're gonna try to tell people whether they lean democratic or republican with a Naive Bayes classifier. We will look at sex, race, generation, and community type.
+Many people and tables discuss the relationship between political leaning and a given demographic. However, what we are attempting to do is predict someone's political leaning based on many demographic features. Presently, we are considering a person's sex, race, generation, community type, income, education, and marital status. To accomplish this we are using a Naive Bayes Classifier and survey data from the Pew Research Center. Before we jump into the code, we should discuss the Naive Bayes Classifier for those that aren't familiar.
+\vspace{12 pt}
 
-First, let's look at the posteriors from the Pew Research Center.
+## Naive Bayes
+
+The Naive Bayes Classifier is a probabilistic classifier based on the application of Bayes' theorem. One of the major assumptions made by this classifier is that the various features are independent. In almost all cases that won't be true, but it's worth noting before we continue. Considering that Bayes' theorem is central to this classifier, let's take a look at the mathematical formulation and make some sense of it.
+
+$$
+p(A|B) = \frac{p(A)p(B|A)}{p(B)}
+$$
+For example, if A is "lean republican" and B is "is married", Bayes' theorem says that the probability a person will lean republican given that they are married is equal to the probability that a person will lean republican, multiplied by the probability that a person will be married given that they lean republican, divided by the probability that a person will be married. Putting this equation into Bayesian probability terminology, it can be read as follows:
+
+$$
+\text{posterior}=\frac{\text{prior}*\text{likelihood}}{\text{evidence}}
+$$
+We refer to the prior in this instance as the class prior, where the classes are the political leanings, and the evidence as the predictor prior, where the predictors are the demographic features of a given individual.
+
+Okay, so we now know how to predict the probability of someone leaning a certain way given a single demographic. As it turns out, the simple classifier doesn't get much more complicated than this. Given many features, we can calculate a class "score" by multiplying the likelihoods for that class as well as the prior for that class. The class with the highest "score" is selected as the prediction. You can see an example of how this is applied with our code at the end of this paper.
+\vspace{12 pt}
+
+## A Brief Discussion of the Data
+
+Normally, we would use a dataset of individuals with information on the features and political leaning of each of them. However, we couldn't find such a dataset very easily. Instead, we found a table from the Pew Research Center. It's titled "2016 Party Identification Detailed Tables." Oddly enough, the table gives us the posteriors and class priors. Additionally, one should only build a model based on a single dataset. However, the predictor priors from the Pew Research Center table differ a little bit from census data. We instead use census data from 2016 for our predictor priors. Ultimately, we need to calculate the likelihoods manually using Bayes' theorem. 
+
+## Calculating the Likelihoods
+
+This section is very code-heavy and is primarily the hand-encoding of each of the priors and the posteriors. First, let's look at the posteriors.
 \vspace{12 pt}
 
 ```{r posteriors}
@@ -182,8 +206,7 @@ probUnmarried <- 0.426
 
 ```
 
-Now that we have all of these, we can used the naive bayes theorem to calculate 
-each of the likelihoods which will be critical in making our predictions.
+Now that we have all of these, we can use Bayes' theorem to calculate each of the likelihoods which will be critical in making our predictions.
 \vspace{12 pt}
 
 ```{r likelihoods}
@@ -303,11 +326,9 @@ probUnmarriedGivenInd <- probIndGivenUnmarried*probUnmarried/probInd
 
 ```
 
-So, if we come up with an example person, we can see which class (political 
-leaning) they are most likely to fall into! Let's suppose that we are interested 
-in knowing a black woman's leaning. It's as simple as multiplying the prior for 
-a given class by the likelihoods for that person given that class. The class with 
-the highest outcome is our prediction! Let's do the calculations.
+## An Example Prediction
+
+If we come up with an example person, we can see which class (political leaning) they are most likely to fall into! Let's suppose that we are interested in knowing a black woman's leaning. It's as simple as multiplying the prior for a given class by the likelihoods for that person given that class. The class with the highest outcome is our prediction! Let's do the calculations.
 \vspace{12 pt}
 
 ```{r Black_Woman_Prediction}
@@ -324,7 +345,5 @@ probDem*probBlackGivenDem*probFemaleGivenDem
 probInd*probBlackGivenInd*probFemaleGivenInd
 ```
 
-As we can see, the value for leaning democratic is higher than all of the other
-values, so we would predict that a black woman leans democratic based on this 
-simple model!
+As we can see, the value for leaning democratic is higher than all of the other values, so we would predict that a black woman leans democratic based on this simple model!
 \vspace{12 pt}
