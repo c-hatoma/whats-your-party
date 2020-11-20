@@ -287,9 +287,9 @@ probSuburbanGivenInd <- probIndGivenSuburban*probSuburban/probInd
 probRuralGivenInd <- probIndGivenRural*probRural/probInd
 
 #by income
-prob75plusGivenDem <- probDemGiven75plus*prob75plus/probDem
-prob30to75GivenDem <- probDemGiven30to75*prob30to75/probDem
-problessthan30GivenDem <- probDemGivenlessthan30*problessthan30/probDem
+prob75plusGivenInd <- probIndGiven75plus*prob75plus/probInd
+prob30to75GivenInd <- probIndGiven30to75*prob30to75/probInd
+problessthan30GivenInd <- probIndGivenlessthan30*problessthan30/probInd
 
 #by education
 probPostgradGivenInd <- probIndGivenPostgrad*probPostgrad/probInd
@@ -328,3 +328,115 @@ As we can see, the value for leaning democratic is higher than all of the other
 values, so we would predict that a black woman leans democratic based on this 
 simple model!
 \vspace{12 pt}
+
+Create a table of all results:
+
+```{r}
+
+# Rep
+
+sexR <- data.frame(var = c("Male", "Female", "Other"),
+                  Rep = c(probMaleGivenRep, probFemaleGivenRep, 1))
+raceR <- data.frame(var = c("White", "Black", "Hispanic", "Asian", "Other"),
+                   Rep = c(probWhiteGivenRep,
+                           probBlackGivenRep,
+                           probHispanicGivenRep,
+                           probAsianGivenRep,
+                           1))
+generationR <- data.frame(var = c("Millenial", "GenX", "Boomer", "Silent"),
+                         Rep = c(probMillenialGivenRep,
+                                 probGenXGivenRep,
+                                 probBoomerGivenRep,
+                                 probSilentGivenRep))
+communityR <- data.frame(var = c("Urban", "Suburban", "Rural"),
+                        Rep = c(probUrbanGivenRep,
+                                probSuburbanGivenRep,
+                                probRuralGivenRep))
+incomeR <- data.frame(var = c("75plus", "30to75", "lessthan30"),
+                     Rep = c(prob75plusGivenRep,
+                             prob30to75GivenRep,
+                             problessthan30GivenRep))
+educationR <- data.frame(var = c("Postgrad", "CollegeGrad", "SomeCollege", "HighSchool"),
+                        Rep = c(probPostgradGivenRep,
+                                probCollegeGradGivenRep,
+                                probSomeCollegeGivenRep,
+                                probHighSchoolGivenRep))
+maritalstatusR <- data.frame(var = c("Married", "Unmarried"),
+                            Rep = c(probMarriedGivenRep,
+                                    probUnmarriedGivenRep))
+
+
+# Dem
+
+sexD <- data.frame(var = c("Male", "Female", "Other"),
+                  Dem = c(probMaleGivenDem, probFemaleGivenDem, 1))
+raceD <- data.frame(var = c("White", "Black", "Hispanic", "Asian", "Other"),
+                   Dem = c(probWhiteGivenDem,
+                           probBlackGivenDem,
+                           probHispanicGivenDem,
+                           probAsianGivenDem,
+                           1))
+generationD <- data.frame(var = c("Millenial", "GenX", "Boomer", "Silent"),
+                         Dem = c(probMillenialGivenDem,
+                                 probGenXGivenDem,
+                                 probBoomerGivenDem,
+                                 probSilentGivenDem))
+communityD <- data.frame(var = c("Urban", "Suburban", "Rural"),
+                        Dem = c(probUrbanGivenDem,
+                                probSuburbanGivenDem,
+                                probRuralGivenDem))
+incomeD <- data.frame(var = c("75plus", "30to75", "lessthan30"),
+                     Dem = c(prob75plusGivenDem,
+                             prob30to75GivenDem,
+                             problessthan30GivenDem))
+educationD <- data.frame(var = c("Postgrad", "CollegeGrad", "SomeCollege", "HighSchool"),
+                        Dem = c(probPostgradGivenDem,
+                                probCollegeGradGivenDem,
+                                probSomeCollegeGivenDem,
+                                probHighSchoolGivenDem))
+maritalstatusD <- data.frame(var = c("Married", "Unmarried"),
+                            Dem = c(probMarriedGivenDem,
+                                    probUnmarriedGivenDem))
+
+# Ind
+
+sexI <- data.frame(var = c("Male", "Female", "Other"),
+                  Ind = c(probMaleGivenInd, probFemaleGivenInd, 1))
+raceI <- data.frame(var = c("White", "Black", "Hispanic", "Asian", "Other"),
+                   Ind = c(probWhiteGivenInd,
+                           probBlackGivenInd,
+                           probHispanicGivenInd,
+                           probAsianGivenInd,
+                           1))
+generationI <- data.frame(var = c("Millenial", "GenX", "Boomer", "Silent"),
+                         Ind = c(probMillenialGivenInd,
+                                 probGenXGivenInd,
+                                 probBoomerGivenInd,
+                                 probSilentGivenInd))
+communityI <- data.frame(var = c("Urban", "Suburban", "Rural"),
+                        Ind = c(probUrbanGivenInd,
+                                probSuburbanGivenInd,
+                                probRuralGivenInd))
+incomeI <- data.frame(var = c("75plus", "30to75", "lessthan30"),
+                      Ind = c(prob75plusGivenInd,
+                              prob30to75GivenInd,
+                              problessthan30GivenInd))
+educationI <- data.frame(var = c("Postgrad", "CollegeGrad", "SomeCollege", "HighSchool"),
+                        Ind = c(probPostgradGivenInd,
+                                probCollegeGradGivenInd,
+                                probSomeCollegeGivenInd,
+                                probHighSchoolGivenInd))
+maritalstatusI <- data.frame(var = c("Married", "Unmarried"),
+                            Ind = c(probMarriedGivenInd,
+                                    probUnmarriedGivenInd))
+
+sex <- cbind(sexR, Dem = sexD[,2], Ind = sexI[,2])
+race <- cbind(raceR, Dem = raceD[,2], Ind = raceI[,2])
+generation <- cbind(generationR, Dem = generationD[,2], Ind = generationI[,2])
+community <- cbind(communityR, Dem = communityD[,2], Ind = communityI[,2])
+income <- cbind(incomeR, Dem = incomeD[,2], Ind = incomeI[,2])
+education <- cbind(educationR, Dem = educationD[,2], Ind = educationI[,2])
+maritalstatus <- cbind(maritalstatusR, Dem = maritalstatusD[,2], Ind = maritalstatusI[,2])
+
+```
+

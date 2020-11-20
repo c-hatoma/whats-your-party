@@ -1,0 +1,101 @@
+library(tidyverse)
+library(shiny)
+library(geojsonio)
+library(rvest)
+library(data.table)
+library(leaflet)
+
+crime <- read_csv("CrimeStatebyState1.csv")
+crime.data <- crime
+
+states <- geojson_read("https://eric.clst.org/assets/wiki/uploads/Stuff/gz_2010_us_040_00_5m.json",
+                       what = "sp")
+states.data <- states
+
+
+ui <- fluidPage(
+    titlePanel("Crime Rates in every US State from 1960 to 2014"),
+    mainPanel(
+        tabsetPanel(
+            tabPanel("Violent Crime Rates", 
+                     leafletOutput(outputId = "map1", width = "150%")), 
+            tabPanel("Property Crime Rates", 
+                     leafletOutput(outputId = "map2", width = "150%"))),
+    sliderInput(inputId = "slider1",
+                label = "Year",
+                min = 1960,
+                max = 2014,
+                value = 1960,
+                animate = TRUE,
+                sep = ""),
+))
+
+server <- function(input, output, session) {
+    
+    output$map1 <- renderLeaflet({
+        
+    crime.data <- crime.data %>%
+        filter(Year == input$slider1)
+    
+    states.data@data <- left_join(states.data@data,
+                                 crime.data,
+                                 by = c("NAME" = "State"))
+    
+    states.data@data$`Violent Crime rate` <- states.data@data$`Violent Crime rate` %>%
+        as.numeric()
+    
+    bins1 <- c(0, 100, 500, 1000, 2000, 3000)
+    colors1 <- colorBin(palette = "YlOrRd",
+                        bins = bins1,
+                        domain = states.data@data$`Violent Crime rate`)
+        
+    states.data %>%
+        leaflet() %>%
+        addTiles() %>%
+        addPolygons(fillColor = ~colors1(`Violent Crime rate`),
+                    weight = 1,
+                    color = "white",
+                    opacity = 1,
+                    fillOpacity = 0.7,
+                    label = ~NAME) %>%
+        setView(-96, 37.8, 3, zoom = 3.5) %>%
+        addLegend(pal = colors1,
+                  values = states.data@data$`Violent Crime rate`,
+                  title = "Violent Crimes per 100,000 People")
+    })
+
+    output$map2 <- renderLeaflet({
+        
+        crime.data <- crime.data %>%
+            filter(Year == input$slider1)
+        
+        states.data@data <- left_join(states.data@data,
+                                 crime.data,
+                                 by = c("NAME" = "State"))
+        
+        states.data@data$`Property crime rate` <- states.data@data$`Property crime rate` %>%
+            as.numeric()
+        
+        bins2 <- c(0, 1000, 2500, 5000, 7500, 10000)
+        colors2 <- colorBin(palette = "YlOrRd",
+                            bins = bins2,
+                            domain = states.data@data$`Property crime rate`)
+        
+        states.data %>%
+            leaflet() %>%
+            addTiles() %>%
+            addPolygons(fillColor = ~colors2(`Property crime rate`),
+                        weight = 2,
+                        color = "white",
+                        opacity = 1,
+                        fillOpacity = 0.7,
+                        label = ~NAME) %>%
+            setView(-96, 37.8, 3.125, zoom = 3.5) %>%
+            addLegend(pal = colors2,
+                      values = states.data@data$`Property crime rate`,
+                      title = "Property Crimes per 100,000 People")
+    })
+}
+
+
+shinyApp(ui, server)
