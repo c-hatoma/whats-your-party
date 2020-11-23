@@ -111,6 +111,7 @@ probRep <- 0.44
 probDem <- 0.48
 probInd <- 0.08
 
+priors <- c(probRep,probDem,probInd)
 #And the predictor priors...
 
 #Sex priors
@@ -379,43 +380,52 @@ income <- cbind(incomeR, Dem = incomeD[,2], Ind = incomeI[,2])
 education <- cbind(educationR, Dem = educationD[,2], Ind = educationI[,2])
 maritalstatus <- cbind(maritalstatusR, Dem = maritalstatusD[,2], Ind = maritalstatusI[,2])
 
+vecS <- NULL
+vecR <- NULL
+vecG <- NULL
+vecC <- NULL
+vecI <- NULL
+vecE <- NULL
+vecM <- NULL
+scores <- NULL
 
 
 ui <- fluidPage(
   
-    titlePanel("Tell us about yourself and we'll guess your political affiliation"),
+    titlePanel("Tell us about yourself and we'll guess your political affiliation!"),
     mainPanel(
         tabsetPanel(
-            tabPanel("tab title", 
-                     selectInput(InputId = "sex",
+            tabPanel("Classifier Tool", 
+                     selectInput(inputId = "sex",
                                  label = "Sex",
                                  choices = sex$var),
                      numericInput(inputId = "age",
                                   label = "Age",
                                   min = 18,
                                   max = 88,
-                                  step = 1),
+                                  step = 1,
+                                  value = 40),
                      selectInput(inputId = "race",
                                  label = "Race",
                                  choices = race$var),
                      sliderInput(inputId = "income",
                                  label = "Family Income",
                                  min = 0,
-                                 max = 1000000,
+                                 max = 500000,
                                  value = 30000,
                                  animate = TRUE,
                                  sep = ""),
                      selectInput(inputId = "education",
                                  label = "Education Level",
                                  choices = education$var),
-                    radioButton(inputId = "married",
+                    radioButtons(inputId = "married",
                                 label = "Are you married?",
                                 choices = maritalstatus$var),
-                    radioButton(inputId = "community",
+                    radioButtons(inputId = "community",
                                 label = "How would you describe your community?",
                                 choices = community$var),
                     
-                    # submitButton("Submit"),
+                    actionButton(inputId = "submitButton", label = "Submit"),
                     
                     textOutput(outputId = "prediction")
     
@@ -424,20 +434,20 @@ ui <- fluidPage(
 server <- function(input, output, session) {
   
   
-  Inputs <- eventReactive({
+  Scores <- eventReactive(input$submitButton, {
   
-    sex[(sex$var == input$sex),]
+    vecS <- sex[(sex$var == input$sex),]
     
-    race[(race$var == input$race),]
+    vecR <- race[(race$var == input$race),]
     
-    education[(education$var == input$education),]
+    vecE <- education[(education$var == input$education),]
     
-    married[(married$var == input$married),]
+    vecM <- maritalstatus[(maritalstatus$var == input$married),]
     
-    community[(community$var == input$community),]
+    vecC <- community[(community$var == input$community),]
     
     
-    if(input$age <= 39){
+    vecG <- if(input$age <= 39){
       generation[(generation$var == 'Millenial'),]
     }else if(input$age <= 55){
       generation[(generation$var == 'GenX'),]
@@ -447,12 +457,34 @@ server <- function(input, output, session) {
       generation[(generation$var == 'Silent'),]
     }
 
-    if(input$income >= 75000){
+    vecI <- if(input$income >= 75000){
       income[(income$var == '75plus'),]
     }else if(input$income >= 30000){
       income[(income$var == '30to75'),]
     }else{
       income[(income$var == 'lessthan30'),]
+    }
+    
+    scores <- rbind(priors,
+                    vecS,
+                    vecR,
+                    vecE,
+                    vecM,
+                    vecC,
+                    vecG,
+                    vecI)
+    
+    repScore <- colProds(as.matrix(scores[,c(2)]))
+    demScore <- colProds(as.matrix(scores[,c(3)]))
+    indScore <- colProds(as.matrix(scores[,c(4)]))
+    maxScore <- max(repScore,demScore,indScore)
+    
+    response <- if (maxScore == repScore){
+      print("We think that you lean Republican.")
+    }else if (maxScore == demScore){
+      print("We think you lean Democratic.")
+    }else{
+      ("We think you are an Independent.")
     }
 
   
@@ -460,7 +492,8 @@ server <- function(input, output, session) {
   
     output$prediction <- renderText({
         
-        test1
+        print(Scores())
+      
         
     })
     
