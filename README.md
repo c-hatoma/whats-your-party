@@ -1,6 +1,6 @@
 # whats-your-party
+## Tell us a bit about yourself and we'll guess your political affiliation
 By Bryce Samwel (MS, Systems Science, Portland State University; BA, Physics, Carroll College) and Chica Morrow (BA, Economics, Middlebury College). Just for fun.
-
 
 Visit our app here:
 https://chica.shinyapps.io/PoliticalPredictions/
