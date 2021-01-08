@@ -1,3 +1,4 @@
+library(matrixStats)
 library(shiny)
 library(tidyverse)
 
@@ -111,7 +112,11 @@ probRep <- 0.44
 probDem <- 0.48
 probInd <- 0.08
 
-priors <- c(probRep,probDem,probInd)
+priors <- data.frame(var = "prior",
+                     Rep = probRep,
+                     Dem = probDem,
+                     Ind = probInd)
+
 #And the predictor priors...
 
 #Sex priors
@@ -279,98 +284,98 @@ probUnmarriedGivenInd <- probIndGivenUnmarried*probUnmarried/probInd
 # Rep
 
 sexR <- data.frame(var = c("Male", "Female", "Other"),
-                  Rep = c(probMaleGivenRep, probFemaleGivenRep, 1))
+                   Rep = c(probMaleGivenRep, probFemaleGivenRep, 1))
 raceR <- data.frame(var = c("White", "Black", "Hispanic", "Asian", "Other"),
-                   Rep = c(probWhiteGivenRep,
-                           probBlackGivenRep,
-                           probHispanicGivenRep,
-                           probAsianGivenRep,
-                           1))
+                    Rep = c(probWhiteGivenRep,
+                            probBlackGivenRep,
+                            probHispanicGivenRep,
+                            probAsianGivenRep,
+                            1))
 generationR <- data.frame(var = c("Millenial", "GenX", "Boomer", "Silent"),
-                         Rep = c(probMillenialGivenRep,
-                                 probGenXGivenRep,
-                                 probBoomerGivenRep,
-                                 probSilentGivenRep))
+                          Rep = c(probMillenialGivenRep,
+                                  probGenXGivenRep,
+                                  probBoomerGivenRep,
+                                  probSilentGivenRep))
 communityR <- data.frame(var = c("Urban", "Suburban", "Rural"),
-                        Rep = c(probUrbanGivenRep,
-                                probSuburbanGivenRep,
-                                probRuralGivenRep))
+                         Rep = c(probUrbanGivenRep,
+                                 probSuburbanGivenRep,
+                                 probRuralGivenRep))
 incomeR <- data.frame(var = c("75plus", "30to75", "lessthan30"),
-                     Rep = c(prob75plusGivenRep,
-                             prob30to75GivenRep,
-                             problessthan30GivenRep))
+                      Rep = c(prob75plusGivenRep,
+                              prob30to75GivenRep,
+                              problessthan30GivenRep))
 educationR <- data.frame(var = c("Postgrad", "CollegeGrad", "SomeCollege", "HighSchool"),
-                        Rep = c(probPostgradGivenRep,
-                                probCollegeGradGivenRep,
-                                probSomeCollegeGivenRep,
-                                probHighSchoolGivenRep))
+                         Rep = c(probPostgradGivenRep,
+                                 probCollegeGradGivenRep,
+                                 probSomeCollegeGivenRep,
+                                 probHighSchoolGivenRep))
 maritalstatusR <- data.frame(var = c("Married", "Unmarried"),
-                            Rep = c(probMarriedGivenRep,
-                                    probUnmarriedGivenRep))
+                             Rep = c(probMarriedGivenRep,
+                                     probUnmarriedGivenRep))
 
 # Dem
 
 sexD <- data.frame(var = c("Male", "Female", "Other"),
-                  Dem = c(probMaleGivenDem, probFemaleGivenDem, 1))
+                   Dem = c(probMaleGivenDem, probFemaleGivenDem, 1))
 raceD <- data.frame(var = c("White", "Black", "Hispanic", "Asian", "Other"),
-                   Dem = c(probWhiteGivenDem,
-                           probBlackGivenDem,
-                           probHispanicGivenDem,
-                           probAsianGivenDem,
-                           1))
+                    Dem = c(probWhiteGivenDem,
+                            probBlackGivenDem,
+                            probHispanicGivenDem,
+                            probAsianGivenDem,
+                            1))
 generationD <- data.frame(var = c("Millenial", "GenX", "Boomer", "Silent"),
-                         Dem = c(probMillenialGivenDem,
-                                 probGenXGivenDem,
-                                 probBoomerGivenDem,
-                                 probSilentGivenDem))
+                          Dem = c(probMillenialGivenDem,
+                                  probGenXGivenDem,
+                                  probBoomerGivenDem,
+                                  probSilentGivenDem))
 communityD <- data.frame(var = c("Urban", "Suburban", "Rural"),
-                        Dem = c(probUrbanGivenDem,
-                                probSuburbanGivenDem,
-                                probRuralGivenDem))
+                         Dem = c(probUrbanGivenDem,
+                                 probSuburbanGivenDem,
+                                 probRuralGivenDem))
 incomeD <- data.frame(var = c("75plus", "30to75", "lessthan30"),
-                     Dem = c(prob75plusGivenDem,
-                             prob30to75GivenDem,
-                             problessthan30GivenDem))
+                      Dem = c(prob75plusGivenDem,
+                              prob30to75GivenDem,
+                              problessthan30GivenDem))
 educationD <- data.frame(var = c("Postgrad", "CollegeGrad", "SomeCollege", "HighSchool"),
-                        Dem = c(probPostgradGivenDem,
-                                probCollegeGradGivenDem,
-                                probSomeCollegeGivenDem,
-                                probHighSchoolGivenDem))
+                         Dem = c(probPostgradGivenDem,
+                                 probCollegeGradGivenDem,
+                                 probSomeCollegeGivenDem,
+                                 probHighSchoolGivenDem))
 maritalstatusD <- data.frame(var = c("Married", "Unmarried"),
-                            Dem = c(probMarriedGivenDem,
-                                    probUnmarriedGivenDem))
+                             Dem = c(probMarriedGivenDem,
+                                     probUnmarriedGivenDem))
 
 # Ind
 
 sexI <- data.frame(var = c("Male", "Female", "Other"),
-                  Ind = c(probMaleGivenInd, probFemaleGivenInd, 1))
+                   Ind = c(probMaleGivenInd, probFemaleGivenInd, 1))
 raceI <- data.frame(var = c("White", "Black", "Hispanic", "Asian", "Other"),
-                   Ind = c(probWhiteGivenInd,
-                           probBlackGivenInd,
-                           probHispanicGivenInd,
-                           probAsianGivenInd,
-                           1))
+                    Ind = c(probWhiteGivenInd,
+                            probBlackGivenInd,
+                            probHispanicGivenInd,
+                            probAsianGivenInd,
+                            1))
 generationI <- data.frame(var = c("Millenial", "GenX", "Boomer", "Silent"),
-                         Ind = c(probMillenialGivenInd,
-                                 probGenXGivenInd,
-                                 probBoomerGivenInd,
-                                 probSilentGivenInd))
+                          Ind = c(probMillenialGivenInd,
+                                  probGenXGivenInd,
+                                  probBoomerGivenInd,
+                                  probSilentGivenInd))
 communityI <- data.frame(var = c("Urban", "Suburban", "Rural"),
-                        Ind = c(probUrbanGivenInd,
-                                probSuburbanGivenInd,
-                                probRuralGivenInd))
+                         Ind = c(probUrbanGivenInd,
+                                 probSuburbanGivenInd,
+                                 probRuralGivenInd))
 incomeI <- data.frame(var = c("75plus", "30to75", "lessthan30"),
                       Ind = c(prob75plusGivenInd,
                               prob30to75GivenInd,
                               problessthan30GivenInd))
 educationI <- data.frame(var = c("Postgrad", "CollegeGrad", "SomeCollege", "HighSchool"),
-                        Ind = c(probPostgradGivenInd,
-                                probCollegeGradGivenInd,
-                                probSomeCollegeGivenInd,
-                                probHighSchoolGivenInd))
+                         Ind = c(probPostgradGivenInd,
+                                 probCollegeGradGivenInd,
+                                 probSomeCollegeGivenInd,
+                                 probHighSchoolGivenInd))
 maritalstatusI <- data.frame(var = c("Married", "Unmarried"),
-                            Ind = c(probMarriedGivenInd,
-                                    probUnmarriedGivenInd))
+                             Ind = c(probMarriedGivenInd,
+                                     probUnmarriedGivenInd))
 
 sex <- cbind(sexR, Dem = sexD[,2], Ind = sexI[,2])
 race <- cbind(raceR, Dem = raceD[,2], Ind = raceI[,2])
@@ -411,7 +416,7 @@ ui <- fluidPage(
                      sliderInput(inputId = "income",
                                  label = "Family Income",
                                  min = 0,
-                                 max = 500000,
+                                 max = 100000,
                                  value = 30000,
                                  animate = TRUE,
                                  sep = ""),
@@ -447,22 +452,22 @@ server <- function(input, output, session) {
     vecC <- community[(community$var == input$community),]
     
     
-    vecG <- if(input$age <= 39){
-      generation[(generation$var == 'Millenial'),]
+    if(input$age <= 39){
+      vecG <- generation[(generation$var == 'Millenial'),]
     }else if(input$age <= 55){
-      generation[(generation$var == 'GenX'),]
+      vecG <- generation[(generation$var == 'GenX'),]
     }else if(input$age <= 74){
-      generation[(generation$var == 'Boomer'),]
+      vecG <- generation[(generation$var == 'Boomer'),]
     }else{
-      generation[(generation$var == 'Silent'),]
+      vecG <- generation[(generation$var == 'Silent'),]
     }
 
-    vecI <- if(input$income >= 75000){
-      income[(income$var == '75plus'),]
+    if(input$income >= 75000){
+      vecI <- income[(income$var == '75plus'),]
     }else if(input$income >= 30000){
-      income[(income$var == '30to75'),]
+      vecI <- income[(income$var == '30to75'),]
     }else{
-      income[(income$var == 'lessthan30'),]
+      vecI <- income[(income$var == 'lessthan30'),]
     }
     
     scores <- rbind(priors,
@@ -473,18 +478,24 @@ server <- function(input, output, session) {
                     vecC,
                     vecG,
                     vecI)
-    
     repScore <- colProds(as.matrix(scores[,c(2)]))
     demScore <- colProds(as.matrix(scores[,c(3)]))
     indScore <- colProds(as.matrix(scores[,c(4)]))
+    totalScore<- repScore + demScore + indScore
+    repScore <- repScore/totalScore
+    demScore <- demScore/totalScore
+    indScore <- indScore/totalScore
     maxScore <- max(repScore,demScore,indScore)
     
-    response <- if (maxScore == repScore){
-      print("We think that you lean Republican.")
-    }else if (maxScore == demScore){
-      print("We think you lean Democratic.")
+    if (maxScore == demScore){
+      response <- sprintf("We think you lean Democrat.
+      \n Republican Leaning = %g, Democrat Leaning = %g, Independent Leaning = %g", repScore, demScore, indScore)
+    }else if (maxScore == repScore){
+      response <- sprintf("We think you lean Republican.
+      \n Republican Leaning = %g, Democrat Leaning = %g, Independent Leaning = %g", repScore, demScore, indScore)
     }else{
-      ("We think you are an Independent.")
+      response <- sprintf("We think you lean Independent.
+      \n Republican Leaning = %g, Democrat Leaning = %g, Independent Leaning = %g", repScore, demScore, indScore)
     }
 
   
